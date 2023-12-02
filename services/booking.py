@@ -75,6 +75,18 @@ class BookingService(BaseService):
         self.commit()
         return True
 
+    def get_booking_by_ref(self, ref):
+        return self.db.query(models.Booking).filter(models.Booking.booking_reference == ref).first()
+
+    def get_others_appointments(self, booking):
+
+        if booking is not None:
+            appointments = self.db.query(models.Appointment).filter(models.Appointment.booking_id != booking.id).all()
+        else:
+            appointments = self.db.query(models.Appointment).all()
+        return appointments
+
+
 
 def get_booking_service(db: models.Db):
     return BookingService(db)

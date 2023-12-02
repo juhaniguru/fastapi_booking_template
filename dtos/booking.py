@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 from pydantic import BaseModel
 
@@ -7,8 +8,18 @@ class CreateBookingRes(BaseModel):
     token: str
 
 
-class BookAppointmentReq(BaseModel):
+class Booking(BaseModel):
+    id: int
+    hour: str
+    min: str
+    own: bool
 
+
+class GetBookingsRes(BaseModel):
+    bookings: List[Booking]
+
+
+class BookAppointmentReq(BaseModel):
     year: int
     month: int
     day: int
@@ -20,6 +31,3 @@ class BookAppointmentReq(BaseModel):
 class BookAppointmentRes(BaseModel):
     operation: str
     done: bool
-
-
-

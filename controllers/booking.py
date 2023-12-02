@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
 import models
-from dependencies import BookingToken
-from dtos.booking import CreateBookingRes, BookAppointmentReq
+from dependencies import BookingToken, BookingRef, OptionalBookingRef
+from dtos.booking import CreateBookingRes, BookAppointmentReq, GetBookingsRes
 from services.booking import BookingServ
 
 router = APIRouter(prefix='/api/v1/booking', tags=['booking'])
@@ -15,9 +15,46 @@ async def create_booking(service: BookingServ, _token: BookingToken):
     return {'token': token_str}
 
 
+@router.get('/', response_model=GetBookingsRes)
+async def get_bookings(_booking: OptionalBookingRef, service: BookingServ):
+    appointments = []
+
+    if _booking is not None:
+        for a in _booking.appointments:
+            appointments.append({
+                'id': a.id,
+                'hour': str(a.hour),
+                'min': '00' if a.min == 0 else str(a.min),
+                'own': True
+            })
+    others_appointments = service.get_others_appointments(_booking)
+    for a in others_appointments:
+        appointments.append({
+            'id': a.id,
+            'hour': str(a.hour),
+            'min': '00' if a.min == 0 else str(a.min),
+            'own': False
+        })
+
+    return {'bookings': appointments}
+
+
+@router.get('/own', response_model=GetBookingsRes)
+async def get_own_bookings(_booking: BookingRef):
+    appointments = []
+    for a in _booking.appointments:
+        appointments.append({
+            'id': a.id,
+            'hour': str(a.hour),
+            'min': '00' if a.min == 0 else str(a.min),
+            'own': True
+        })
+
+    return {'bookings': appointments}
+
+
 @router.post('/appointment/')
 async def book_appointment(req: BookAppointmentReq, _token: BookingToken, service: BookingServ):
-
     booking = _token.validate(req.booking_reference)
 
     appointment = models.Appointment(year=req.year, month=req.month, day=req.day, hour=req.hour, min=req.min)
@@ -28,5 +65,3 @@ async def book_appointment(req: BookAppointmentReq, _token: BookingToken, servic
         'operation': operation,
         'done': done
     }
-
-

@@ -19,6 +19,7 @@ class Booking(Base):
     id = Column(Integer, primary_key=True)
     created_at = Column(DateTime, nullable=False)
     booking_reference = Column(String(255), nullable=False, unique=True)
+    appointments = relationship('Appointment', back_populates='booking')
 
 
 class Appointment(Base):
