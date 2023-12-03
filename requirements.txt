@@ -3,3 +3,4 @@ sqlalchemy
 fastapi
 uvicorn[standard]
 pyJWT[crypto]
+websockets
