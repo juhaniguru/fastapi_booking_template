@@ -36,7 +36,7 @@ def check_optional_booking_ref(_token: BookingToken, service: BookingServ,
             payload = _token.validate(_booking_ref)
             booking = service.get_booking_by_ref(payload['sub'])
             if booking is None:
-                raise HTTPException(status_code=401, detail='Unauthorized')
+                return None
             return booking
         return None
     except Exception as e:

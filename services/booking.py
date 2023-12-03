@@ -33,13 +33,15 @@ class BookingService(BaseService):
             return False, None
 
         # jos varaus löytyy, haetaan kaikki sille vuodelle, kuukaudelle, päivälle, tunnille ja minutille varatut tapaamiset
-        existing_appointments = self.db.query(models.Appointment).filter(
+        q = self.db.query(models.Appointment).filter(
 
             (models.Appointment.year == appointment.year) &
             (models.Appointment.month == appointment.month) &
             (models.Appointment.day == appointment.day) &
             (models.Appointment.hour == appointment.hour) &
-            (models.Appointment.min == appointment.min)).all()
+            (models.Appointment.min == appointment.min))
+
+        existing_appointments = q.all()
 
         # jos varattuja tapaamisia ei ole, voidaan varata tapaaminen
         if len(existing_appointments) == 0:
